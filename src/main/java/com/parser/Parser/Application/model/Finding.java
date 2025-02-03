@@ -1,12 +1,11 @@
 package com.parser.Parser.Application.model;
 
-import java.time.Instant;
 import java.util.Map;
 
 public class Finding {
 
-    private String id;             // could be from the tool's "number" or a random UUID
-    private ToolType toolType;     // code scanning, dependabot, or secret scanning
+    private String id;             
+    private ToolType toolType;    
     private String title;
     private String description;
     private Status status;

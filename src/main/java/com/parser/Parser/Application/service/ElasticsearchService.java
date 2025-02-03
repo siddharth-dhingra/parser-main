@@ -3,6 +3,7 @@ package com.parser.Parser.Application.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
+
 import com.parser.Parser.Application.model.Finding;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class ElasticsearchService {
         this.esClient = esClient;
     }
 
-    public void indexFinding(Finding finding) throws IOException {
+    public IndexResponse indexFinding(Finding finding) throws IOException {
         if (finding.getId() == null) {
             finding.setId(UUID.randomUUID().toString());
         }
@@ -34,5 +35,6 @@ public class ElasticsearchService {
         );
 
         IndexResponse response = esClient.index(request);
+        return response;
     }
 }
