@@ -1,5 +1,6 @@
 package com.parser.Parser.Application.service.toolParser;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.parser.Parser.Application.model.Finding;
+import com.parser.Parser.Application.model.Status;
 import com.parser.Parser.Application.model.ToolType;
 import com.parser.Parser.utils.ParserUtils;
 
@@ -48,12 +50,14 @@ public class DependabotParser {
         f.setTitle(advisory.path("summary").asText("Unnamed Dependabot Alert"));
         f.setDescription(advisory.path("description").asText(""));
 
-        // status from "state": "open", "dismissed", etc.
         f.setStatus(ParserUtils.mapStatus(node.path("state").asText("open")));
 
         // severity from "security_advisory.severity"
         String rawSev = advisory.path("severity").asText("medium");
         f.setSeverity(ParserUtils.mapSeverity(rawSev));
+
+        f.setCreatedAt(LocalDateTime.now().toString());
+        f.setUpdatedAt(LocalDateTime.now().toString());
 
         // url => "html_url"
         f.setUrl(node.path("html_url").asText(""));

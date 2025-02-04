@@ -1,5 +1,7 @@
 package com.parser.Parser.Application.service.toolParser;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +61,9 @@ public class CodeScanParser {
         // Severity from "rule.security_severity_level"
         String rawSev = rule.path("security_severity_level").asText("medium");
         f.setSeverity(ParserUtils.mapSeverity(rawSev));
+
+        f.setCreatedAt(LocalDateTime.now().toString());
+        f.setUpdatedAt(LocalDateTime.now().toString());
 
         // Handle optional CVE if present
         // Adjust the path to wherever CVE might actually appear in your data

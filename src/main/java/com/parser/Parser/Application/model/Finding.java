@@ -10,8 +10,8 @@ public class Finding {
     private String description;
     private Status status;
     private Severity severity;
-//    private Instant createdAt;
-//    private Instant updatedAt;
+   private String createdAt;
+   private String updatedAt;
     private String url;
     private String cve;
     private String cwe;
@@ -69,21 +69,21 @@ public class Finding {
         this.severity = severity;
     }
 
-//    public Instant getCreatedAt() {
-//        return createdAt;
-//    }
-//
-//    public void setCreatedAt(Instant createdAt) {
-//        this.createdAt = createdAt;
-//    }
-//
-//    public Instant getUpdatedAt() {
-//        return updatedAt;
-//    }
-//
-//    public void setUpdatedAt(Instant updatedAt) {
-//        this.updatedAt = updatedAt;
-//    }
+   public String getCreatedAt() {
+       return createdAt;
+   }
+
+   public void setCreatedAt(String createdAt) {
+       this.createdAt = createdAt;
+   }
+
+   public String getUpdatedAt() {
+       return updatedAt;
+   }
+
+   public void setUpdatedAt(String updatedAt) {
+       this.updatedAt = updatedAt;
+   }
 
     public String getUrl() {
         return url;
