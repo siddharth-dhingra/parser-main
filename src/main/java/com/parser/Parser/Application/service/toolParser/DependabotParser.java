@@ -50,7 +50,11 @@ public class DependabotParser {
         f.setTitle(advisory.path("summary").asText("Unnamed Dependabot Alert"));
         f.setDescription(advisory.path("description").asText(""));
 
-        f.setStatus(ParserUtils.mapStatus(node.path("state").asText("open")));
+        String rawState = node.path("state").asText("open").toLowerCase();
+        String rawDismissedReason = node.path("dismissed_reason").asText("");
+        f.setStatus(ParserUtils.mapStatus(rawState,rawDismissedReason, ToolType.DEPENDABOT));
+
+        // f.setStatus(ParserUtils.mapStatus(node.path("state").asText("open")));
 
         // severity from "security_advisory.severity"
         String rawSev = advisory.path("severity").asText("medium");

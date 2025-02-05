@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.parser.Parser.Application.model.Finding;
+import com.parser.Parser.Application.model.Status;
 import com.parser.Parser.Application.model.ToolType;
 import com.parser.Parser.utils.ParserUtils;
 
@@ -55,8 +56,12 @@ public class CodeScanParser {
         f.setDescription(rule.path("full_description").asText(""));
 
         // Status from "state"
-        String rawState = node.path("state").asText("open");
-        f.setStatus(ParserUtils.mapStatus(rawState));
+        // String rawState = node.path("state").asText("open");
+        // f.setStatus(ParserUtils.mapStatus(rawState));
+
+        String rawState = node.path("state").asText("open").toLowerCase();
+        String rawDismissedReason = node.path("dismissed_reason").asText("");
+        f.setStatus(ParserUtils.mapStatus(rawState,rawDismissedReason, ToolType.CODESCAN));
 
         // Severity from "rule.security_severity_level"
         String rawSev = rule.path("security_severity_level").asText("medium");

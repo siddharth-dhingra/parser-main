@@ -52,7 +52,11 @@ public class SecretScanParser {
         // description => "secret_type"
         f.setDescription("Exposed secret of type: " + node.path("secret_type").asText(""));
 
-        f.setStatus(ParserUtils.mapStatus(node.path("state").asText("open")));
+        String rawState = node.path("state").asText("open");
+        String resolution = node.path("resolution").asText("");
+        f.setStatus(ParserUtils.mapStatus(rawState, resolution, ToolType.SECRETSCAN));
+
+        // f.setStatus(ParserUtils.mapStatus(node.path("state").asText("open")));
 
         // severity? fallback to MEDIUM unless you have some logic to adjust
         f.setSeverity(Severity.CRITICAL);

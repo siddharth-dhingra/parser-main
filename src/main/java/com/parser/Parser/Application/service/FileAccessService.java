@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 
-
 import com.parser.Parser.Application.model.FileLocationEvent;
 import com.parser.Parser.Application.model.Finding;
 import com.parser.Parser.Application.model.ToolType;
