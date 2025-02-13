@@ -17,37 +17,6 @@ public class ParserUtils {
         return OBJECT_MAPPER;
     }
 
-    // public static Status mapStatus(String rawState, String reason) {
-    //     if (rawState == null) {
-    //         return Status.OPEN;
-    //     }
-    //     switch (rawState.toLowerCase()) {
-    //         case "open":
-    //             return Status.OPEN;
-    //         case "auto_dismissed":
-    //             return Status.SUPPRESSED;
-    //         case "dismissed":
-    //             // return Status.FALSE_POSITIVE;
-    //             // If there's a reason like "false positive," map to that
-    //             if (reason != null) {
-    //                 String reasonLower = reason.toLowerCase(Locale.ROOT);
-    //                 // Map "false positive" to our FALSE_POSITIVE
-    //                 if ("false positive".equals(reasonLower) || "false_positive".equals(reasonLower) || "inaccurate".equals(reasonLower)) {
-    //                     return Status.FALSE_POSITIVE;
-    //                 }
-    //             }
-    //             return Status.SUPPRESSED;
-    //         case "fixed":
-    //         case "resolved":
-    //         case "closed":
-    //             return Status.FIXED;
-    //         case "confirmed":
-    //             return Status.CONFIRM;
-    //         default:
-    //             return Status.OPEN;
-    //     }
-    // }
-
     public static Status mapStatus(String rawState, String reason, ToolType toolType) {
         if (toolType == null) {
             return Status.OPEN;
@@ -80,12 +49,6 @@ public class ParserUtils {
         return Status.OPEN;
     }
 
-    /**
-     * Codescan mapping:
-     * - "open" -> OPEN
-     * - "dismissed" with reason "false positive" (or "false_positive") -> FALSE_POSITIVE
-     * - "dismissed" with any other reason -> SUPPRESSED
-     */
     public static Status mapStatusForCodescan(String rawState, String reason) {
         if (rawState == null) {
             return Status.OPEN;
@@ -105,12 +68,6 @@ public class ParserUtils {
         return Status.OPEN;
     }
 
-    /**
-     * SecretScan mapping:
-     * - "open" -> OPEN
-     * - "resolved" with reason "false positive" (or "false_positive") -> FALSE_POSITIVE
-     * - "resolved" with any other reason -> SUPPRESSED
-     */
     public static Status mapStatusForSecretscan(String rawState, String reason) {
         if (rawState == null) {
             return Status.OPEN;
@@ -154,18 +111,4 @@ public class ParserUtils {
                 return Severity.INFO;
         }
     }
-
-    //     /**
-//      * Parse a date string like "2025-01-27T05:06:14Z" into Instant.
-//      */
-//     private Instant parseDate(String dateStr) {
-//         if (dateStr == null || dateStr.isEmpty()) {
-//             return Instant.now();
-//         }
-//         try {
-//             return Instant.parse(dateStr);
-//         } catch (Exception e) {
-//             return Instant.now();
-//         }
-//     }
 }

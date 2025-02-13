@@ -45,7 +45,7 @@ public class FileAccessService {
 
             List<Finding> incomingFindings = parserService.parse(toolType, rawJson);
 
-            List<Finding> existingDocs = elasticsearchService.findByToolType(toolType);
+            List<Finding> existingDocs = elasticsearchService.findByToolType(fileDetails.getEsIndex(), toolType);
 
             Map<String, Finding> existingMap = new HashMap<>();
             for (Finding doc : existingDocs) {
@@ -57,14 +57,14 @@ public class FileAccessService {
                 String incomingHash = FindingHashCalculator.computeHash(f);
 
                 if (!existingMap.containsKey(incomingHash)) {
-                    IndexResponse response = elasticsearchService.indexFinding(f);
+                    IndexResponse response = elasticsearchService.indexFinding(fileDetails.getEsIndex(), f);
                     LOGGER.info("Indexed doc ID: " + response.id() + " result: " + response.result());
                 } else {
                     Finding existingDoc = existingMap.get(incomingHash);
                     if (FindingComparator.hasSignificantDifferences(existingDoc, f)) {
                         f.setId(existingDoc.getId());
                         f.setCreatedAt(existingDoc.getCreatedAt());
-                        IndexResponse response = elasticsearchService.indexFinding(f);
+                        IndexResponse response = elasticsearchService.indexFinding(fileDetails.getEsIndex(), f);
                         LOGGER.info("Indexed doc ID: " + response.id() + " result: " + response.result());
                     } else {
                         LOGGER.info("No changes => skipping doc => " + f.getId());

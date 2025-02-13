@@ -1,6 +1,5 @@
 package com.parser.Parser.Application.service.toolParser;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.parser.Parser.Application.model.Finding;
-import com.parser.Parser.Application.model.Status;
 import com.parser.Parser.Application.model.ToolType;
 import com.parser.Parser.utils.ParserUtils;
 
@@ -43,47 +41,31 @@ public class CodeScanParser {
         Finding f = new Finding();
         f.setToolType(ToolType.CODESCAN);
 
-        // ID from "number"
         f.setId(UUID.randomUUID().toString());
 
-        // f.setId(UUID.randomUUID().toString());
-
-        // Title from "rule.name" or fallback
         JsonNode rule = node.path("rule");
         f.setTitle(rule.path("name").asText("Unnamed CodeScan Alert"));
 
-        // Description from "rule.description"
         f.setDescription(rule.path("full_description").asText(""));
-
-        // Status from "state"
-        // String rawState = node.path("state").asText("open");
-        // f.setStatus(ParserUtils.mapStatus(rawState));
 
         String rawState = node.path("state").asText("open").toLowerCase();
         String rawDismissedReason = node.path("dismissed_reason").asText("");
         f.setStatus(ParserUtils.mapStatus(rawState,rawDismissedReason, ToolType.CODESCAN));
 
-        // Severity from "rule.security_severity_level"
         String rawSev = rule.path("security_severity_level").asText("medium");
         f.setSeverity(ParserUtils.mapSeverity(rawSev));
 
         f.setCreatedAt(LocalDateTime.now().toString());
         f.setUpdatedAt(LocalDateTime.now().toString());
 
-        // Handle optional CVE if present
-        // Adjust the path to wherever CVE might actually appear in your data
         String cve = node.path("cve").asText("");
         f.setCve(cve);
 
-        // Handle optional CVSS score if present
-        // Adjust the path to wherever CVSS might actually appear in your data
         double cvssScore = node.path("cvss").asDouble(0.0);
         f.setCvss(cvssScore);
 
-        // url = "html_url"
         f.setUrl(node.path("html_url").asText(""));
 
-        // parse cwe from "rule.tags" if it contains something like "external/cwe/cwe-073"
         List<String> cweList = new ArrayList<>();
         JsonNode tags = rule.path("tags");
         if (tags.isArray()) {
@@ -97,7 +79,6 @@ public class CodeScanParser {
             f.setCwe(String.join(",", cweList));
         }
 
-        // location => node.most_recent_instance.location.path + line
         JsonNode loc = node.path("most_recent_instance").path("location");
         if (!loc.isMissingNode()) {
             String path = loc.path("path").asText("");
@@ -105,14 +86,7 @@ public class CodeScanParser {
             f.setLocation(path + " (line " + startLine + ")");
         }
 
-        // leftover in additionalData:
         Map<String, Object> leftover = objectMapper.convertValue(node, Map.class);
-//        leftover.put("toolName", node.path("tool").path("name").asText(""));
-//        leftover.put("dismissed_reason", node.path("dismissed_reason").asText(""));
-//        leftover.put("fixed_at", node.path("fixed_at").asText(""));
-
-        // Add the entire original JSON node as a string for reference
-//        leftover.put("complete_data", node.toString());
 
         f.setAdditionalData(leftover);
 
