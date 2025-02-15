@@ -4,17 +4,13 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
-import co.elastic.clients.elasticsearch.indices.ExistsRequest;
-import co.elastic.clients.transport.endpoints.BooleanResponse;
 
 import com.parser.Parser.Application.model.Finding;
 import com.parser.Parser.Application.model.ToolType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -36,7 +32,7 @@ public class ElasticsearchService {
     public List<Finding> findByToolType(String esIndex, ToolType toolType) throws IOException {
 
         ensureIndexExists(esIndex);
-        
+
         SearchResponse<Finding> response = esClient.search(s -> s
                 .index(esIndex)
                 .query(q -> q.term(t -> t

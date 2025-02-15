@@ -2,44 +2,44 @@ package com.parser.Parser.Application.model;
 
 public class FileLocationEvent {
 
+    private String tenantId;   
     private String filePath;
-    private String esIndex;
-    private String toolName;
+    private ToolType toolName;
 
     public FileLocationEvent() {}
 
-    public FileLocationEvent(String filePath, String esIndex, String toolName) {
+    public FileLocationEvent(String tenantId, String filePath, ToolType toolName) {
+        this.tenantId = tenantId;
         this.filePath = filePath;
-        this.esIndex = esIndex;
         this.toolName = toolName;
     }
 
+    public String getTenantId() {
+        return tenantId;
+    }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    
     public String getFilePath() {
         return filePath;
     }
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
-
-    public String getEsIndex() {
-        return esIndex;
-    }
-    public void setEsIndex(String esIndex) {
-        this.esIndex = esIndex;
-    }
-
-    public String getToolName() {
+    
+    public ToolType getToolName() {
         return toolName;
     }
-    public void setToolName(String toolName) {
+    public void setToolName(ToolType toolName) {
         this.toolName = toolName;
     }
 
     @Override
     public String toString() {
         return "FileLocationEvent{" +
-                "filePath='" + filePath + '\'' +
-                ", esIndex='" + esIndex + '\'' +
+                "tenantId='" + tenantId + '\'' +
+                ", filePath='" + filePath + '\'' +
                 ", toolName='" + toolName + '\'' +
                 '}';
     }

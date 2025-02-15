@@ -1,5 +1,6 @@
 package com.parser.Parser.Application.consumer;
 
+import com.parser.Parser.Application.dto.ScanParseEvent;
 import com.parser.Parser.Application.model.FileLocationEvent;
 import com.parser.Parser.Application.service.FileAccessService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -28,10 +29,12 @@ public class ParserConsumer {
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "fileLocationEventListenerFactory"
     )
-    public void consumeFileLocationEvent(ConsumerRecord<String, FileLocationEvent> record) {
-        FileLocationEvent fle = record.value();
+    public void consumeFileLocationEvent(ConsumerRecord<String, ScanParseEvent> record) {
+        ScanParseEvent eventWrapper = record.value();
+        String eventId = eventWrapper.getEventId();
+        FileLocationEvent fle = eventWrapper.getPayload();
         LOGGER.info("Received FileLocationEvent: " + fle);
 
-        fileAccessService.processFile(fle);
+        fileAccessService.processFile(fle, eventId);
     }
 }
