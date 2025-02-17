@@ -3,16 +3,16 @@ package com.parser.Parser.Application.dto;
 import java.util.UUID;
 
 import com.parser.Parser.Application.model.Acknowledgement;
-import com.parser.Parser.Application.model.AcknowledgementEvent;
+import com.parser.Parser.Application.model.AcknowledgementPayload;
 
-public class ParseAcknowledgement implements Acknowledgement<AcknowledgementEvent> {
+public class ParseAcknowledgement implements Acknowledgement<AcknowledgementPayload> {
     
     private String acknowledgementId;
-    private AcknowledgementEvent payload;
+    private AcknowledgementPayload payload;
 
     public ParseAcknowledgement() {}   
 
-    public ParseAcknowledgement(String acknowledgementId, AcknowledgementEvent payload) {
+    public ParseAcknowledgement(String acknowledgementId, AcknowledgementPayload payload) {
         this.acknowledgementId = (acknowledgementId == null || acknowledgementId.isEmpty()) ? UUID.randomUUID().toString() : acknowledgementId;
         this.payload = payload;
     }
@@ -21,7 +21,7 @@ public class ParseAcknowledgement implements Acknowledgement<AcknowledgementEven
         this.acknowledgementId = acknowledgementId;
     }
 
-    public void setPayload(AcknowledgementEvent payload) {
+    public void setPayload(AcknowledgementPayload payload) {
         this.payload = payload;
     }
 
@@ -31,7 +31,7 @@ public class ParseAcknowledgement implements Acknowledgement<AcknowledgementEven
     }
 
     @Override
-    public AcknowledgementEvent getPayload() {
+    public AcknowledgementPayload getPayload() {
         return payload;
     }
 }

@@ -5,6 +5,7 @@ public class FileLocationEvent {
     private String tenantId;   
     private String filePath;
     private ToolType toolName;
+    private String jobId;
 
     public FileLocationEvent() {}
 
@@ -35,12 +36,20 @@ public class FileLocationEvent {
         this.toolName = toolName;
     }
 
+    public String getJobId() {
+        return jobId;
+    }
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
     @Override
     public String toString() {
         return "FileLocationEvent{" +
                 "tenantId='" + tenantId + '\'' +
                 ", filePath='" + filePath + '\'' +
                 ", toolName='" + toolName + '\'' +
+                ", jobId='" + jobId + '\'' +
                 '}';
     }
 }

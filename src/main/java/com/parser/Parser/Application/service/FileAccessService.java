@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 
 import com.parser.Parser.Application.dto.ParseAcknowledgement;
-import com.parser.Parser.Application.model.AcknowledgementEvent;
+import com.parser.Parser.Application.model.AcknowledgementPayload;
 import com.parser.Parser.Application.model.AcknowledgementStatus;
 import com.parser.Parser.Application.model.FileLocationEvent;
 import com.parser.Parser.Application.model.Finding;
@@ -45,15 +45,14 @@ public class FileAccessService {
         this.acknowledgementProducer = acknowledgementProducer;
     }
     
-    public void processFile(FileLocationEvent fileDetails, String eventId){
-
-        File file = new File(fileDetails.getFilePath());
-        if (!file.exists()) {
-            LOGGER.error("File not found at path: " + fileDetails.getFilePath());
-            return;
-        }
+    public void processFile(FileLocationEvent fileDetails, String jobId){
 
         try {
+            File file = new File(fileDetails.getFilePath());
+            if (!file.exists()) {
+                LOGGER.error("File not found at path: " + fileDetails.getFilePath());
+                return;
+            }
             String rawJson = Files.readString(file.toPath());
             ToolType toolType = fileDetails.getToolName();
 
@@ -62,7 +61,7 @@ public class FileAccessService {
             Optional<Tenant> tenantOpt = tenantRepository.findByTenantId(fileDetails.getTenantId());
             if (tenantOpt.isEmpty()) {
                 LOGGER.error("No tenant found for tenantId: {}", fileDetails.getTenantId());
-                return;
+                throw new RuntimeException("No tenant found for tenantId: " + fileDetails.getTenantId());
             }
             Tenant tenant = tenantOpt.get();
             String esIndex = tenant.getEsIndex();
@@ -100,15 +99,19 @@ public class FileAccessService {
                 Thread.currentThread().interrupt();
             }
 
-            AcknowledgementEvent ackEvent = new AcknowledgementEvent(eventId);
-            ackEvent.setStatus(AcknowledgementStatus.SUCCESS);
-            ParseAcknowledgement parseAck = new ParseAcknowledgement(null, ackEvent);
-            acknowledgementProducer.sendAcknowledgement(parseAck);
-            LOGGER.info("Sent ParseAcknowledgement for tenantId: {}", fileDetails.getTenantId());
-
-
+            sendAcknowledgement(jobId, AcknowledgementStatus.SUCCESS);
         } catch (IOException e) {
+            
+            sendAcknowledgement(jobId, AcknowledgementStatus.FAILURE);
             e.printStackTrace();
         }
+    }
+
+    private void sendAcknowledgement(String jobId, AcknowledgementStatus status) {
+        AcknowledgementPayload ackEvent = new AcknowledgementPayload(jobId);
+        ackEvent.setStatus(status);
+        ParseAcknowledgement parseAck = new ParseAcknowledgement(null, ackEvent);
+        acknowledgementProducer.sendAcknowledgement(parseAck);
+        LOGGER.info("Sent acknowledgement for jobId {}: {}", jobId, parseAck);
     }
 }

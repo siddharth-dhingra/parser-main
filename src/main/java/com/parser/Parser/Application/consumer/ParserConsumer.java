@@ -31,10 +31,10 @@ public class ParserConsumer {
     )
     public void consumeFileLocationEvent(ConsumerRecord<String, ScanParseEvent> record) {
         ScanParseEvent eventWrapper = record.value();
-        String eventId = eventWrapper.getEventId();
         FileLocationEvent fle = eventWrapper.getPayload();
+        String jobId = fle.getJobId();
         LOGGER.info("Received FileLocationEvent: " + fle);
 
-        fileAccessService.processFile(fle, eventId);
+        fileAccessService.processFile(fle, jobId);
     }
 }
