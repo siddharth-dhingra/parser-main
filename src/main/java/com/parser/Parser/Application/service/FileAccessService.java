@@ -94,6 +94,12 @@ public class FileAccessService {
                 }
             }
 
+            try {
+                Thread.sleep(15000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+
             AcknowledgementEvent ackEvent = new AcknowledgementEvent(eventId);
             ackEvent.setStatus(AcknowledgementStatus.SUCCESS);
             ParseAcknowledgement parseAck = new ParseAcknowledgement(null, ackEvent);
