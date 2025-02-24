@@ -66,6 +66,8 @@ public class SecretScanParser {
 
         f.setLocation("");
 
+        f.setTicketId(null);
+
         Map<String, Object> leftover = objectMapper.convertValue(node, Map.class);
 
         f.setAdditionalData(leftover);

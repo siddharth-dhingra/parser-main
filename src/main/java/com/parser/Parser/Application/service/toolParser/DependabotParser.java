@@ -73,6 +73,8 @@ public class DependabotParser {
         String manifestPath = node.path("dependency").path("manifest_path").asText("");
         f.setLocation(manifestPath);
 
+        f.setTicketId(null);
+
         Map<String, Object> leftover = objectMapper.convertValue(node, Map.class);
 
         f.setAdditionalData(leftover);

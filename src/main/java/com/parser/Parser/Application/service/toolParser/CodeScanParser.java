@@ -86,6 +86,8 @@ public class CodeScanParser {
             f.setLocation(path + " (line " + startLine + ")");
         }
 
+        f.setTicketId(null);
+
         Map<String, Object> leftover = objectMapper.convertValue(node, Map.class);
 
         f.setAdditionalData(leftover);

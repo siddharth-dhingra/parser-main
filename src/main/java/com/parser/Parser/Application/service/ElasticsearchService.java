@@ -58,7 +58,7 @@ public class ElasticsearchService {
 
         IndexRequest<Finding> request = IndexRequest.of(i -> i
                 .index(esIndex)
-                .id(finding.getToolType()+finding.getId())
+                .id(finding.getId())
                 .document(finding)
         );
 

@@ -17,6 +17,7 @@ public class Finding {
     private String cwe;
     private Double cvss;
     private String location;       // e.g. file path or dependency location
+    private String ticketId;
     private Map<String, Object> additionalData; // leftover fields
 
     public Finding() {}
@@ -133,6 +134,14 @@ public class Finding {
         this.additionalData = additionalData;
     }
 
+    public String getTicketId() {
+        return ticketId;
+    }
+
+    public void setTicketId(String ticketId) {
+        this.ticketId = ticketId;
+    }
+
     @Override
     public String toString() {
         return "Finding{" +
@@ -149,6 +158,7 @@ public class Finding {
                 ", cwe='" + cwe + '\'' +
                 ", cvss=" + cvss +
                 ", location='" + location + '\'' +
+                ", ticketId='" + ticketId + '\'' +
                 ", additionalData=" + additionalData +
                 '}';
     }
