@@ -20,6 +20,8 @@ app:
   kafka:
     topics:
       filelocation: jfc-parser-topic
+      jfc-unified: job-topic
+      runbook-destination: jfc-bgjobs-topic1
       job-acknowledgement: job-acknowledgement-topic
   elasticsearch:
     uris: http://localhost:9200

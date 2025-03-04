@@ -3,6 +3,7 @@ package com.parser.Parser.Application.service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,17 +11,22 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 
+import com.parser.Parser.Application.dto.NewScanEvent;
 import com.parser.Parser.Application.dto.ParseAcknowledgement;
 import com.parser.Parser.Application.model.AcknowledgementPayload;
 import com.parser.Parser.Application.model.AcknowledgementStatus;
 import com.parser.Parser.Application.model.FileLocationEvent;
 import com.parser.Parser.Application.model.Finding;
+import com.parser.Parser.Application.model.NewScanPayload;
 import com.parser.Parser.Application.model.Tenant;
 import com.parser.Parser.Application.model.ToolType;
+import com.parser.Parser.Application.model.TriggerType;
 import com.parser.Parser.Application.producer.AcknowledgementProducer;
+import com.parser.Parser.Application.producer.NewScanProducer;
 import com.parser.Parser.Application.repository.TenantRepository;
 import com.parser.Parser.utils.FindingComparator;
 import com.parser.Parser.utils.FindingHashCalculator;
@@ -34,15 +40,23 @@ public class FileAccessService {
     private final ElasticsearchService elasticsearchService;
     private final TenantRepository tenantRepository;
     private final AcknowledgementProducer acknowledgementProducer;
+    private final NewScanProducer newScanProducer;
+
+    @Value("${app.kafka.topics.jfc-unified}")
+    private String jfcUnifiedTopic;
+
+    @Value("${app.kafka.topics.runbook-destination}")
+    private String runbookDestinationTopic;
 
     public FileAccessService(ParserService parserService, 
                              ElasticsearchService elasticsearchService, 
                              TenantRepository tenantRepository,
-                             AcknowledgementProducer acknowledgementProducer) {
+                             AcknowledgementProducer acknowledgementProducer, NewScanProducer newScanProducer) {
         this.parserService = parserService;
         this.elasticsearchService = elasticsearchService;
         this.tenantRepository = tenantRepository;
         this.acknowledgementProducer = acknowledgementProducer;
+        this.newScanProducer = newScanProducer;
     }
     
     public void processFile(FileLocationEvent fileDetails, String jobId){
@@ -74,11 +88,14 @@ public class FileAccessService {
                 existingMap.put(docHash, doc);
             }
 
+            List<String> allFindingIds = new ArrayList<>();
+
             for (Finding f : incomingFindings) {
                 String incomingHash = FindingHashCalculator.computeHash(f);
 
                 if (!existingMap.containsKey(incomingHash)) {
                     IndexResponse response = elasticsearchService.indexFinding(esIndex, f);
+                    allFindingIds.add(response.id());
                     LOGGER.info("Indexed doc ID: " + response.id() + " result: " + response.result());
                 } else {
                     Finding existingDoc = existingMap.get(incomingHash);
@@ -86,18 +103,25 @@ public class FileAccessService {
                         f.setId(existingDoc.getId());
                         f.setCreatedAt(existingDoc.getCreatedAt());
                         IndexResponse response = elasticsearchService.indexFinding(esIndex, f);
+                        allFindingIds.add(f.getId());
                         LOGGER.info("Indexed doc ID: " + response.id() + " result: " + response.result());
                     } else {
+                        allFindingIds.add(existingDoc.getId());
                         LOGGER.info("No changes => skipping doc => " + f.getId());
                     }
                 }
             }
 
-            try {
-                Thread.sleep(15000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
+            NewScanPayload payload = new NewScanPayload(
+                    fileDetails.getTenantId(),
+                    jobId,
+                    allFindingIds,
+                    TriggerType.NEW_SCAN,
+                    runbookDestinationTopic
+            );
+
+            NewScanEvent event = new NewScanEvent(payload);
+            newScanProducer.publishNewScan(jfcUnifiedTopic, event);
 
             sendAcknowledgement(jobId, AcknowledgementStatus.SUCCESS);
         } catch (IOException e) {
